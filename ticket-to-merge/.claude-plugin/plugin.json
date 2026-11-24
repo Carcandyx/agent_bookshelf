@@ -1,0 +1,5 @@
+{
+  "name": "ticket-to-merge",
+  "version": "0.1.0",
+  "description": "Take one ticket from briefing to merge-ready: criteria mapping, test design, tests-first implementation in a 3-layer architecture, git shipping and a read-only code review, with guardrails that protect the database, schema and dependencies."
+}

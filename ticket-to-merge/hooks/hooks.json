@@ -1,0 +1,30 @@
+{
+  "description": "ticket-to-merge guardrails: protect.js blocks edits to the database, schema, migrations, .env, dependencies and the guardrail itself, and enforces per-agent and per-stage write rules. stop-gate.js refuses to finish a shipping run while the test suite is red.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit|Bash|Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/protect.js"],
+            "onFailure": "block"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/hooks/stop-gate.js"],
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  }
+}

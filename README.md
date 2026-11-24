@@ -183,6 +183,25 @@ npm run test:run  # Run tests once
 
 Note: The test setup is included, but actual tests are intentionally missing (homework gap).
 
+## Ticket to Merge (capstone)
+
+The `ticket-to-merge/` folder is a Claude Code plugin that takes one ticket from its text to a reviewed, committed branch, with guardrails that protect the database, schema and dependencies.
+
+```bash
+claude plugin validate ./ticket-to-merge
+claude --plugin-dir ./ticket-to-merge
+```
+
+- `/ticket-to-merge:ship-ticket <ID> <pasted ticket text or criteria>` runs the whole pipeline.
+- `/ticket-to-merge:review-pr` reviews the current branch against `main`.
+
+Where to look:
+
+| What | Where |
+|---|---|
+| How to run it, the design, the guardrails, the cost report | [`ticket-to-merge/README.md`](ticket-to-merge/README.md) |
+| Repo conventions and the 3-layer rules agents follow | [`CLAUDE.md`](CLAUDE.md) |
+
 ## License
 
 GPL-3.0

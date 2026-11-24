@@ -1,0 +1,193 @@
+{
+  "id": "book-101-book-search",
+  "name": "Book Search Plan",
+  "title": "BOOK-101: book search by title or author",
+  "meta": [
+    "Entry point: GET /books/search?q= (existing stub, called by the home page search box)",
+    "18 failing tests already exist in tests/routes/book-search.test.ts",
+    "No schema change, migration or new dependency. Nothing is committed until you approve"
+  ],
+  "context": "The home page search box already sends GET /books/search?q= with HTMX, but the route is a stub. This change makes it return the matching books as the same card grid the home page shows, matched on title or author as continuous text in any position, ignoring case (accented letters included), sorted by title. An empty, missing or whitespace-only query shows every book; a query over 100 characters after trimming, or a q sent twice or as an object, gets a 400 error fragment. The controller only reads q and picks the response, the new service holds the rules (type check, trim, length, empty means all), and the repository runs one parameterised query. SQLite folds ASCII letters only, so the database wrapper registers a small unicode_lower SQL function and the query uses instr() instead of LIKE, which also makes % and _ plain characters. The failing tests for every criterion already exist and are not changed.",
+  "layers": [
+    "Browser",
+    "Route (controller)",
+    "Service",
+    "Repository (model)",
+    "Database",
+    "View"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Search box (HTMX)",
+      "layer": 0,
+      "purpose": "A reader typing in the home page search box; HTMX sends GET /books/search?q= and swaps the answer into #search-results."
+    }
+  ],
+  "files": [
+    {
+      "id": "home",
+      "path": "src/views/books/index.ejs",
+      "status": "M",
+      "layer": 0,
+      "purpose": "The home page with the search box and #search-results.",
+      "children": [
+        {
+          "id": "home.grid",
+          "name": "#search-results grid",
+          "kind": "config",
+          "status": "M",
+          "purpose": "The inline card loop is replaced by an include of the shared books/book-grid partial, so the first render and every search answer use the same markup."
+        },
+        {
+          "id": "home.swap",
+          "name": "htmx:beforeSwap listener",
+          "kind": "config",
+          "status": "U",
+          "purpose": "Small inline script: when the target is #search-results and the status is 400, swap the error fragment in (HTMX 1.9 does not swap 4xx by default), so the message replaces earlier results."
+        }
+      ]
+    },
+    {
+      "id": "route",
+      "path": "src/routes/books.ts",
+      "status": "M",
+      "layer": 1,
+      "purpose": "HTML controllers for books. Other handlers keep calling models directly (old shape, not refactored).",
+      "children": [
+        {
+          "id": "route.search",
+          "name": "GET /books/search",
+          "kind": "route",
+          "status": "M",
+          "purpose": "Replaces the stub. Passes req.query.q unchanged to bookService.searchBooks, renders books/book-grid with 200. Catches ValidationError and renders books/search-error with 400; any other error goes on to Express's error handler. No trimming or checks here."
+        }
+      ]
+    },
+    {
+      "id": "errors",
+      "path": "src/services/errors.ts",
+      "status": "U",
+      "layer": 2,
+      "purpose": "Typed errors that services throw and controllers map to responses.",
+      "children": [
+        {
+          "id": "errors.validation",
+          "name": "ValidationError",
+          "signature": "(message: string)",
+          "kind": "class",
+          "visibility": "public",
+          "status": "U",
+          "purpose": "Error subclass with name 'ValidationError', exactly as in the layer rules."
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "path": "src/services/bookService.ts",
+      "status": "U",
+      "layer": 2,
+      "purpose": "Business rules for book search. No req/res, no status codes, no SQL.",
+      "children": [
+        {
+          "id": "service.search",
+          "name": "searchBooks",
+          "signature": "(query: unknown): Book[]",
+          "kind": "function",
+          "visibility": "public",
+          "status": "U",
+          "purpose": "Missing q counts as empty. A non-string q (array or object) throws ValidationError('Search query must be a single text value'). Trims; if more than 100 Unicode characters (Array.from length) throws ValidationError('Search query must be 100 characters or fewer'). Empty after trim returns getAllBooks(); otherwise returns the repository's searchBooks(trimmed). Inner spaces kept."
+        },
+        {
+          "id": "service.max",
+          "name": "SEARCH_QUERY_MAX_LENGTH",
+          "kind": "constant",
+          "status": "U",
+          "purpose": "100, the limit on the trimmed query."
+        }
+      ]
+    },
+    {
+      "id": "model",
+      "path": "src/models/book.ts",
+      "status": "M",
+      "layer": 3,
+      "purpose": "Data access for books. One query per function. getAllBooks is reused unchanged for the empty query.",
+      "children": [
+        {
+          "id": "model.search",
+          "name": "searchBooks",
+          "signature": "(text: string): Book[]",
+          "kind": "function",
+          "visibility": "public",
+          "status": "M",
+          "purpose": "Existing, unused LIKE helper rewritten: 'SELECT * FROM books WHERE instr(unicode_lower(title), unicode_lower(?)) > 0 OR instr(unicode_lower(author), unicode_lower(?)) > 0 ORDER BY title' with [text, text]. The text is only ever a bound value; instr has no wildcards, so % and _ are literal, and one row per book means a match in both fields appears once."
+        }
+      ]
+    },
+    {
+      "id": "db",
+      "path": "src/db/index.ts",
+      "status": "M",
+      "layer": 4,
+      "purpose": "sql.js wrapper (initDb, all, get, run). No schema or data change.",
+      "children": [
+        {
+          "id": "db.init",
+          "name": "initDb",
+          "signature": "(path?: string)",
+          "kind": "function",
+          "visibility": "public",
+          "status": "M",
+          "purpose": "After opening each Database, registers the SQL function unicode_lower with db.create_function: JavaScript toLowerCase on text, NULL stays NULL. Lives only on the open connection; nothing is written to the database file or schema."
+        }
+      ]
+    },
+    {
+      "id": "grid",
+      "path": "src/views/books/book-grid.ejs",
+      "status": "U",
+      "layer": 5,
+      "purpose": "Shared card grid, used by the home page and returned alone as the search fragment (no header or layout).",
+      "children": [
+        {
+          "id": "grid.cards",
+          "name": "book cards",
+          "kind": "config",
+          "status": "U",
+          "purpose": "div.book-grid with one card per book: title linking to /books/<id>, 'by <author>', year when present, all with <%= %>. When the list is empty: 'No books found' and no cards."
+        }
+      ]
+    },
+    {
+      "id": "err",
+      "path": "src/views/books/search-error.ejs",
+      "status": "U",
+      "layer": 5,
+      "purpose": "The 400 fragment for a rejected search.",
+      "children": [
+        {
+          "id": "err.msg",
+          "name": "error paragraph",
+          "kind": "config",
+          "status": "U",
+          "purpose": "<p class=\"error\"><%= message %></p>. Shows only the fixed service message, never the submitted text."
+        }
+      ]
+    }
+  ],
+  "flows": [
+    { "from": "browser", "to": "route.search", "label": "GET ?q=" },
+    { "from": "home.grid", "to": "grid.cards", "label": "includes" },
+    { "from": "route.search", "to": "service.search", "label": "passes raw q" },
+    { "from": "service.search", "to": "service.max", "label": "checks length" },
+    { "from": "service.search", "to": "errors.validation", "label": "throws on bad q" },
+    { "from": "route.search", "to": "errors.validation", "label": "maps to 400" },
+    { "from": "service.search", "to": "model.search", "label": "non-empty query" },
+    { "from": "service.search", "to": "model", "label": "getAllBooks if empty" },
+    { "from": "model.search", "to": "db.init", "label": "uses unicode_lower" },
+    { "from": "route.search", "to": "grid.cards", "label": "renders 200" },
+    { "from": "route.search", "to": "err.msg", "label": "renders 400" },
+    { "from": "home.swap", "to": "err.msg", "label": "swaps 400 in" }
+  ]
+}

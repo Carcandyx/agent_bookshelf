@@ -149,3 +149,6 @@ vite.config.ts.timestamp-*
 *.db
 *.sqlite
 *.sqlite3
+
+# Pipeline state marker (never committed)
+docs/tickets/.stage

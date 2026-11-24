@@ -1,0 +1,6 @@
+{
+  "name": "ticket-to-merge-plugin-scripts",
+  "private": true,
+  "type": "commonjs",
+  "description": "Marks the plugin's hook and eval scripts as CommonJS. Has no dependencies."
+}

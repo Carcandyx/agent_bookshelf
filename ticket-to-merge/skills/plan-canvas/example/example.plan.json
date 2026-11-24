@@ -1,0 +1,163 @@
+{
+  "id": "abc-123-shelf-count",
+  "name": "Shelf Count Plan",
+  "title": "ABC-123: show how many books are on each shelf",
+  "meta": [
+    "Example plan: invented ticket, shows the shape of a plan file",
+    "Nothing is committed until you say so"
+  ],
+  "context": "The shelves page lists books but never says how many are on each shelf. This change adds a count per shelf, shown next to the shelf name. The count is computed from the existing shelf data, so nothing in the database changes. The controller only passes the numbers on to the page; the service decides what is counted and how a missing user is treated; the repository runs the query.",
+  "layers": [
+    "Caller",
+    "Controller",
+    "Service",
+    "Repository",
+    "View"
+  ],
+  "actors": [
+    {
+      "id": "browser",
+      "label": "Browser",
+      "layer": 0,
+      "purpose": "A reader opening the shelves page."
+    }
+  ],
+  "files": [
+    {
+      "id": "route",
+      "path": "src/routes/shelves.ts",
+      "status": "M",
+      "layer": 1,
+      "purpose": "Reads the request, calls the service and renders the page with the counts.",
+      "children": [
+        {
+          "id": "route.list",
+          "name": "GET /shelves",
+          "kind": "route",
+          "status": "M",
+          "purpose": "Also passes the counts to the view."
+        }
+      ]
+    },
+    {
+      "id": "service",
+      "path": "src/services/shelfService.ts",
+      "status": "U",
+      "layer": 2,
+      "purpose": "Business rules for shelf summaries. No request, response or SQL.",
+      "children": [
+        {
+          "id": "service.summary",
+          "name": "getShelfSummary",
+          "signature": "(userId: unknown)",
+          "kind": "function",
+          "visibility": "public",
+          "status": "U",
+          "purpose": "Validates the user id, asks the repository for the counts and fills in zero for empty shelves."
+        },
+        {
+          "id": "service.shelves",
+          "name": "SHELF_NAMES",
+          "kind": "constant",
+          "status": "U",
+          "purpose": "The three shelf names, so every shelf appears even when it is empty."
+        }
+      ]
+    },
+    {
+      "id": "model",
+      "path": "src/models/shelf.ts",
+      "status": "M",
+      "layer": 3,
+      "purpose": "Data access for shelves. One query per function.",
+      "children": [
+        {
+          "id": "model.count",
+          "name": "countByShelf",
+          "signature": "(userId: number)",
+          "kind": "function",
+          "visibility": "public",
+          "status": "U",
+          "purpose": "Returns the number of books per shelf for one user, using a bound parameter."
+        },
+        {
+          "id": "model.sql",
+          "name": "COUNT_BY_SHELF_SQL",
+          "kind": "constant",
+          "status": "U",
+          "purpose": "The query text with a ? placeholder."
+        }
+      ]
+    },
+    {
+      "id": "view",
+      "path": "src/views/shelves/index.ejs",
+      "status": "M",
+      "layer": 4,
+      "purpose": "The shelves page.",
+      "children": [
+        {
+          "id": "view.badge",
+          "name": "shelf count badge",
+          "kind": "config",
+          "status": "U",
+          "purpose": "Shows the number next to each shelf name, escaped with the normal output tag."
+        }
+      ]
+    },
+    {
+      "id": "test",
+      "path": "tests/routes/shelf-count.test.ts",
+      "status": "U",
+      "layer": 4,
+      "purpose": "Checks the page through the entry point. Written before the code.",
+      "children": [
+        {
+          "id": "test.counts",
+          "name": "shelf counts",
+          "kind": "function",
+          "visibility": "public",
+          "status": "U",
+          "purpose": "Opens the page for a seeded user and checks each count."
+        }
+      ]
+    }
+  ],
+  "flows": [
+    {
+      "from": "browser",
+      "to": "route.list",
+      "label": "GET"
+    },
+    {
+      "from": "route.list",
+      "to": "service.summary",
+      "label": "calls"
+    },
+    {
+      "from": "service.summary",
+      "to": "service.shelves",
+      "label": "fills empty shelves"
+    },
+    {
+      "from": "service.summary",
+      "to": "model.count",
+      "label": "asks for counts"
+    },
+    {
+      "from": "model.count",
+      "to": "model.sql",
+      "label": "runs"
+    },
+    {
+      "from": "route.list",
+      "to": "view.badge",
+      "label": "renders"
+    },
+    {
+      "from": "test.counts",
+      "to": "route.list",
+      "label": "requests"
+    }
+  ]
+}

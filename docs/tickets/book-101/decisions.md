@@ -83,11 +83,14 @@ Copied from the "Decisions made without the user" section of `implementation.md`
 
 | Finding | Severity | What was done | Why |
 |---|---|---|---|
+| none: the first review returned `[]` | n/a | no fix round needed | The reviewer checked layering, bound-value SQL, interface and messages against the briefing, constraints and test presence. It did not check browser behaviour of the `htmx:beforeSwap` listener, and left the pre-existing foreign-keys reset out because it is not in the diff. |
 
 ## 5. Test disputes and other calls
 
 | What | Ruling | Why |
 |---|---|---|
+| `plan.json` was not committed. | left untracked | The git-bot's commit rules say never to stage plan JSON, although implementation.md listed it. |
+| The test-writer's VERIFY run could not save its output to a scratchpad file (guardrail); the orchestrator wrote `test-run.txt` from the report. | no retry | The output text is the agent's own. |
 | Plan review: the user replied "All good, continue" with no plan changes. | approved as published | No decision above was changed at the plan review. |
 | The guardrail blocked one implementor debugging command (it named a throwaway `.db` probe file in the scratchpad). | not retried; cause found by reading sql.js source | No protected file was touched. |
 | Pre-existing bug noticed by the implementor: sql.js `export()` resets `PRAGMA foreign_keys`, so foreign keys are not enforced after `initDb`. | left as is | Outside this ticket (see implementation.md Notes). |

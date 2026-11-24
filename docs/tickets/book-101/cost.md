@@ -8,7 +8,7 @@ How to read each number: take the total at the checkpoint, subtract the previous
 |---|---|---|---|---|
 | Baseline | step 1, before any agent runs | $0.1821 | 83% | claude-sonnet-5-5 ($0.1820), claude-haiku-5-5 ($0.0001) |
 | After build | step 9 passes | $4.68 | 97% | claude-opus-5-5 ($2.99), claude-sonnet-5-5 ($1.68), claude-haiku-5-5 ($0.0034) |
-| After review | step 11, first review | | | |
+| After review | step 11, first review | $5.12 | 97% | claude-opus-5-5 ($2.99), claude-sonnet-5-5 ($2.12), claude-haiku-5-5 ($0.0084) |
 | After each fix iteration | after each re-verify | | | |
 | Final | step 13 | | | |
 
