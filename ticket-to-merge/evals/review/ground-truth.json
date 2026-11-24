@@ -1,0 +1,9 @@
+[
+ {"id":"B1","rule":"S-1","file":"src/models/book.ts","line":24,"what":"SQL built from user text with a template literal"},
+ {"id":"B2","rule":"A-1/A-2","file":"src/routes/books.ts","line":16,"what":"length rule moved into the controller, removed from the service"},
+ {"id":"B3","rule":"C-2","file":"package.json","line":44,"also":["src/services/bookService.ts:1"],"what":"new dependency lodash"},
+ {"id":"B4","rule":"T-3","file":"tests/routes/book-search.test.ts","line":60,"what":"it.skip on TC-02"},
+ {"id":"B5","rule":"S-5","file":"src/views/books/book-grid.ejs","line":7,"what":"book title output unescaped with <%- %>"},
+ {"id":"B6","rule":"C-1","file":"src/db/schema.sql","line":55,"what":"ALTER TABLE adds a column"},
+ {"id":"B7","rule":"Q-2","file":"src/services/bookService.ts","line":14,"what":"console.log left in the service"}
+]

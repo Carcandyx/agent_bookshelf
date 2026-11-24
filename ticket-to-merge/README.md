@@ -2,6 +2,42 @@
 
 A Claude Code plugin that takes one ticket from its text to a reviewed, committed branch. Agents build it, agents review it, and numbers grade it.
 
+Repo: https://github.com/Carcandyx/agent_bookshelf (plugin in `ticket-to-merge/`, ticket records in `docs/tickets/`).
+
+## How to run it
+
+Requirements: Node.js 24, `npm ci` done once, and on Windows `mkdir C:	mp` once (the existing tests write there). Run these from the repo root.
+
+```
+claude plugin validate ./ticket-to-merge     # must print "Validation passed"
+claude --plugin-dir ./ticket-to-merge        # start Claude Code with the plugin loaded
+```
+
+Inside that session (after editing the plugin, run `/reload-plugins`):
+
+| Command | What to type | What happens |
+|---|---|---|
+| Ship a ticket | `/ticket-to-merge:ship-ticket BOOK-101 <paste the ticket text or acceptance criteria>` | The ID is the first word; everything after it is the ticket. A path to a text file also works. The run asks for `/usage` numbers at the start (answer with the numbers, or `skip`), builds the briefing, tests and plan, shows the plan on a canvas page, and then waits for your approval. After the plan is approved it needs nothing else from you except the `/usage` pauses. |
+| Review | `/ticket-to-merge:review-pr` | Reviews the current branch against `main` and prints findings as JSON. Options: `--base <ref>`, `--patch <file>`, `--briefing <path>`, `--tests <path>`. Asks no questions. |
+
+The only decision the pipeline asks of a person is the plan review. Everything it decides in your place is written to `docs/tickets/<ID>/decisions.md`.
+
+Specification and conventions:
+
+- `CLAUDE.md` (repo root) holds the conventions, the three-layer rules and the constraints every agent follows. The guardrail hook enforces the constraints.
+- The per-ticket specification is `docs/tickets/<ID>/briefing.md` (acceptance criteria, the interface, the decisions taken) with `tests.md` as its test list. A single repo-wide `SPEC.md` is not used, because the plugin has to work for tickets it has not seen.
+
+## Evidence
+
+| Item | Result |
+|---|---|
+| Plugin validates | `claude plugin validate ./ticket-to-merge` prints "Validation passed with warnings". The warnings are advice only: no author or icon in `plugin.json`, and no marketplace install line in this README. |
+| Green test run | `docs/tickets/book-101/test-run.txt`: 4 files, 32 tests passed (14 existing, 18 new for the ticket), 0 failed. |
+| Guardrail self-test | `node ticket-to-merge/hooks/bypass-test.js`: 64/64 cases behave as expected. |
+| First real ticket | BOOK-101 (search books by title or author): steps 1 to 11 ran with one human decision (the plan review); the first review returned no findings. Records in `docs/tickets/book-101/`. |
+| Review recall and precision | 100% recall (21/21) and 85.7% precision over 3 runs on seven planted bugs; 0 false alarms on the clean change. See the measurement section. |
+| Cost report and lever | $4.94 for one ticket; see the cost report. |
+
 - `/ticket-to-merge:ship-ticket <ID> <pasted ticket text or criteria>` runs the pipeline with you in the loop. A path to a text file also works in place of the pasted text.
 - `/ticket-to-merge:review-pr [--base <ref>] [--patch <file>]` reviews a branch or patch and prints findings as JSON. No questions asked.
 
@@ -51,6 +87,7 @@ Documents for each ticket land in `docs/tickets/<ID>/`: `source.md`, `briefing.m
 | `skills/code-review` | The project standards, your own checks (`references/user-checks.md`), severity guide. |
 | `skills/plan-canvas` | The plan review page used by the implementor (a copy of the repo's `.claude/skills/plan-canvas`). |
 | `agents/` | criteria-agent, gap-resolver, criteria-tester, implementor, test-writer, git-bot, code-reviewer. |
+| `evals/review/` | The review eval: patches with planted bugs, ground truth, method and results. |
 | `hooks/` | `hooks.json`, `protect.js` (guardrail), `stop-gate.js`, `stage.js`, `bypass-test.js`. |
 
 ## Design
@@ -81,7 +118,7 @@ An agent can decide a gap wrongly, and the pipeline goes on with it. The mitigat
 | implementor | opus, effort high | The only agent that designs a solution. |
 | test-writer | sonnet | Writes from a list. |
 | git-bot | haiku | Runs a fixed git recipe. |
-| code-reviewer | sonnet | Precision matters more than depth here; changing this is the obvious cost lever, to be measured once a real run exists. |
+| code-reviewer | sonnet | Precision matters more than depth here. Haiku matched it on the review eval (see the cost lever), but the default stays until a real ticket confirms it. |
 
 These are starting points. The cost report below is where they are tested.
 
@@ -96,7 +133,7 @@ These are starting points. The cost report below is where they are tested.
 
 `hooks/stop-gate.js` refuses to let the session finish in the `ship` stage while `npm run test:run` fails.
 
-Known limits: a command that builds a protected file name at run time (shell variables, base64) is not recognised, and a Bash command that names a protected file and can write is blocked even when it only reads it (use the Read tool). `node ticket-to-merge/hooks/bypass-test.js` runs 59 scripted cases (three bypass scenarios plus the actions that must keep working).
+Known limits: a command that builds a protected file name at run time (shell variables, base64) is not recognised, and a Bash command that names a protected file and can write is blocked even when it only reads it (use the Read tool). `node ticket-to-merge/hooks/bypass-test.js` runs 64 scripted cases (three bypass scenarios plus the actions that must keep working).
 
 ### What I would cut
 
@@ -104,20 +141,46 @@ Known limits: a command that builds a protected file name at run time (shell var
 - The second gap-resolver round: stop after the first and let the criteria-agent's leftovers go to the log.
 - Splitting the reviewer into specialists. One generalist is used until a real run shows it missing things.
 
+## Review measurement: recall and precision
+
+Seven bugs were planted in a copy of the real BOOK-101 change (SQL built from input, a rule in the controller, a new dependency, a skipped test, unescaped output, a schema change, a leftover `console.log`), and `/review-pr`'s reviewer was run three times on it, and three times on the clean change. Method, files and every miss are in [`evals/review/README.md`](evals/review/README.md).
+
+| Case (3 runs each) | Recall | Precision |
+|---|---|---|
+| Planted bugs, reviewer on sonnet (as shipped) | 21/21 = 100% | 24 of 28 findings = 85.7% |
+| Clean change, reviewer on sonnet | n/a | 0 findings in 3 runs (0 false alarms) |
+
+Three of the four counted false positives are true: planting the SQL bug left a helper unused, and the reviewer said so. One is a real false alarm (an import rule cited on a file that does not break it). Read the result with the limits in mind: the planted bugs match the reviewer's own rule list, so they are the easy case, and the three runs share one ticket. A harder set (wrong status code, an off-by-one at the limit) is the next step.
+
 ## Cost report
 
-The pipeline asks you to run `/usage` at checkpoints (a plugin cannot run it for you) and records the numbers in `docs/tickets/<ID>/cost.md`. The table and the one lever are filled there; the filled copy goes into this README when a real ticket has been run.
+Source: `docs/tickets/book-101/cost.md`, from `/usage` readings taken during the real BOOK-101 run. The `/usage` totals are cumulative, so each stage is the difference between two readings (the baseline $0.18 was before any agent ran and is subtracted).
 
 | Stage | Cost | Cache hit | Models |
 |---|---|---|---|
-| Build | not measured yet | | |
-| Review | not measured yet | | sonnet (code-reviewer) |
-| Fix loop | not measured yet | | |
-| Total, one ticket | not measured yet | | |
+| Build (criteria, tests, plan, implementation, verify) | $4.50 | 97% (cumulative) | opus $2.99, sonnet $1.50, haiku $0.003 |
+| Review | $0.44 | 97% (cumulative) | sonnet $0.44, haiku $0.005 |
+| Fix loop | $0.00 | n/a | none ran: tests green at first verify, first review clean |
+| **Total, one ticket** | **$4.94** | 97% | opus 61%, sonnet 39% |
+
+Opus is used by two agents, the gap-resolver and the implementor. Per-agent costs are not shown by `/usage`, so the split between those two is not known. The cache hit is cumulative over the session at each reading.
+
+### The one lever
+
+**Reviewer on haiku instead of sonnet**, tested on the review eval above (same planted patch, 3 runs each):
+
+| | Recall | Precision | Tokens per run |
+|---|---|---|---|
+| sonnet (shipped) | 21/21 | 85.7% | about 79k |
+| haiku | 21/21 | 83.9% | about 93k |
+
+Quality held on this eval, but the saving is small and unproven: the review is $0.44 of $4.94 (9%), and haiku read about 17% more tokens per run, so a dollar saving is not shown. The default stays on sonnet until a real ticket's `/usage` shows haiku cheaper at the same quality. **The lever with the most to gain is the implementor on sonnet**: opus is 61% of the ticket's cost. It has not been tested, because it needs a second ticket run with the model changed, then the tests and the review compared with BOOK-101.
 
 ## Known gaps
 
-- `/ship-ticket` has not been run end to end yet. There is no ticket-specific content in the plugin: each ticket's briefing, tests and plan are created under `docs/tickets/<ID>/` from the text passed to the command.
-- There are no evals yet. They will be designed after the first real run, from what that run shows.
+- Only one ticket (BOOK-101) has been run end to end, and only up to the first review: the push and the closing `/usage` were not taken, so the cost log has no "Final" reading.
+- The review eval is a single set of seven easy bugs on one ticket (see above). The plugin was not loaded in the session that ran it, so the reviews ran through general-purpose agents given the `code-reviewer` instructions.
+- The cost lever is a candidate with a quality check, not a measured dollar saving.
+- There is no repo-wide `SPEC.md`: each ticket's `briefing.md` is its specification, so the plugin stays ticket-agnostic.
 - The agents' `skills:` preloading and `SendMessage` continuation depend on the Claude Code version; the prompts include a fallback (paths in the prompt, and a fresh agent with the previous output).
-- `claude plugin validate` passes with warnings for a missing author and icon.
+- `claude plugin validate` passes with warnings (no author, no icon, no marketplace install line).

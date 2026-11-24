@@ -187,20 +187,28 @@ Note: The test setup is included, but actual tests are intentionally missing (ho
 
 The `ticket-to-merge/` folder is a Claude Code plugin that takes one ticket from its text to a reviewed, committed branch, with guardrails that protect the database, schema and dependencies.
 
+Repo: https://github.com/Carcandyx/agent_bookshelf
+
 ```bash
+npm ci
 claude plugin validate ./ticket-to-merge
 claude --plugin-dir ./ticket-to-merge
 ```
 
-- `/ticket-to-merge:ship-ticket <ID> <pasted ticket text or criteria>` runs the whole pipeline.
-- `/ticket-to-merge:review-pr` reviews the current branch against `main`.
+Then, inside that Claude Code session:
 
-Where to look:
+- `/ticket-to-merge:ship-ticket <ID> <pasted ticket text or acceptance criteria>` runs the whole pipeline. Agents decide the gaps and design the tests; you review the plan on the canvas page and run `/usage` when asked.
+- `/ticket-to-merge:review-pr` reviews the current branch against `main` and prints findings as JSON.
 
 | What | Where |
 |---|---|
-| How to run it, the design, the guardrails, the cost report | [`ticket-to-merge/README.md`](ticket-to-merge/README.md) |
-| Repo conventions and the 3-layer rules agents follow | [`CLAUDE.md`](CLAUDE.md) |
+| How to run it, design, guardrails | [`ticket-to-merge/README.md`](ticket-to-merge/README.md) |
+| Conventions and the 3-layer rules agents follow | [`CLAUDE.md`](CLAUDE.md) |
+| Specification of the first ticket | [`docs/tickets/book-101/briefing.md`](docs/tickets/book-101/briefing.md) |
+| Green test run (32 passed) | [`docs/tickets/book-101/test-run.txt`](docs/tickets/book-101/test-run.txt) |
+| Review recall and precision (3 runs) | [`ticket-to-merge/evals/review/README.md`](ticket-to-merge/evals/review/README.md) |
+| Cost report and lever | [`docs/tickets/book-101/cost.md`](docs/tickets/book-101/cost.md) and the plugin README |
+| Decisions the agents took instead of a person | [`docs/tickets/book-101/decisions.md`](docs/tickets/book-101/decisions.md) |
 
 ## License
 
