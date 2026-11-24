@@ -1,0 +1,61 @@
+{
+  "ticket": "BOOK-101",
+  "title": "Book search by title or author",
+  "revision": 1,
+  "tests": [
+    {"id":"TC-01","title":"Partial title match","what":"A reader types part of a title, such as 'ring', and gets the book whose title contains it.","criteria":["AC-01"],"type":"happy","likelihood":"common","expected":"GET /books/search?q=ring returns 200 and an HTML fragment with a card for 'The Lord of the Rings'. Books whose title and author do not contain 'ring' are absent."},
+    {"id":"TC-02","title":"Partial author match","what":"A reader types part of an author name, such as 'tolk', and gets that author's books.","criteria":["AC-01"],"type":"happy","likelihood":"common","expected":"GET /books/search?q=tolk returns 200 with cards for books by J.R.R. Tolkien. Books by other authors are absent."},
+    {"id":"TC-03","title":"Case-insensitive match","what":"The same word typed in upper, lower and mixed case finds the same book.","criteria":["AC-01"],"type":"happy","likelihood":"common","expected":"q=DUNE, q=dune and q=DuNe all return 200 with the same set of cards, including 'Dune'."},
+    {"id":"TC-04","title":"Accented letters case-insensitive","what":"A reader searches for an author with an accented capital letter.","criteria":["AC-01"],"type":"boundary","likelihood":"occasional","expected":"q=MIÉVILLE and q=miéville (URL-encoded) both return a card for a book by China Miéville. q=Mieville (no accent) returns no card for that author."},
+    {"id":"TC-05","title":"Title or author, whole query","what":"The whole query must be inside the title or inside the author. Two words split across both fields do not match.","criteria":["AC-01"],"type":"happy","likelihood":"occasional","expected":"q=Dune%20Herbert returns 200 and no book cards. q=Dune and q=Herbert each return 'Dune'. A book that matches in both fields appears exactly once."},
+    {"id":"TC-06","title":"No match message","what":"A reader searches for text that is in no title or author.","criteria":["AC-01"],"type":"happy","likelihood":"common","expected":"Returns 200 (not an error), an HTML fragment with no book cards, and the text 'No books found'."},
+    {"id":"TC-07","title":"Card layout and order","what":"Matching books are shown as on the home page and sorted by title.","criteria":["AC-01"],"type":"happy","likelihood":"common","expected":"A query matching several books returns an HTML fragment (not a full page, not JSON). Each card has the title linking to /books/<id>, 'by <author>', and the published year when present. Cards are in ascending title order. The test does not rely on the order of identical titles."},
+    {"id":"TC-08","title":"Percent and underscore literal","what":"A reader types '%' or '_', which must be treated as plain characters and not as wildcards.","criteria":["AC-01"],"type":"boundary","likelihood":"occasional","expected":"q=%25 returns 200 and no seed books ('No books found'). q=_ returns only books whose title or author literally contains an underscore (none in the seed data), not every book."},
+    {"id":"TC-09","title":"Empty query returns all","what":"The reader clears the search box and sees the full list again.","criteria":["AC-02","AC-01"],"type":"happy","likelihood":"common","expected":"q= (empty) returns 200 with all 50 seed books in title order ('1984' first). A non-empty query such as q=dune returns fewer cards than this full list."},
+    {"id":"TC-10","title":"Missing or blank query","what":"A request with no q, or with only spaces, is treated as an empty query.","criteria":["AC-02","AC-03"],"type":"validation","likelihood":"occasional","expected":"GET /books/search with no q, and q=%20%20%20, both return 200 with the same 50 books in the same order as q=."},
+    {"id":"TC-11","title":"Padded query is trimmed","what":"A reader types a word with leading and trailing spaces.","criteria":["AC-03"],"type":"validation","likelihood":"common","expected":"q=%20%20dune%20%20 returns 200 and the same cards as q=dune. Spaces inside a query are kept: q=lord%20of matches 'The Lord of the Rings'."},
+    {"id":"TC-12","title":"Exactly 100 characters accepted","what":"A query of exactly 100 characters is at the limit and is allowed.","criteria":["AC-04"],"type":"boundary","likelihood":"occasional","expected":"A 100-letter q returns 200 (an HTML fragment, 'No books found'), not 400."},
+    {"id":"TC-13","title":"101 characters rejected","what":"A reader pastes a query that is one character over the limit.","criteria":["AC-04"],"type":"boundary","likelihood":"common","expected":"A 101-letter q returns 400 with an HTML fragment containing <p class=\"error\"> with exactly 'Search query must be 100 characters or fewer'. The body has no book cards and does not repeat the submitted text."},
+    {"id":"TC-14","title":"Limit measured after trim","what":"Surrounding spaces do not count toward the 100-character limit, and spaces do not hide an over-long query.","criteria":["AC-03","AC-04"],"type":"boundary","likelihood":"occasional","expected":"100 letters wrapped in spaces (for example 5 on each side) return 200. 101 letters wrapped in spaces return 400 with the length message."},
+    {"id":"TC-15","title":"Limit counts characters","what":"A query of 100 accented or non-ASCII characters is within the limit, and 101 is over.","criteria":["AC-04"],"type":"boundary","likelihood":"rare","expected":"100 characters such as 'é' (200 bytes) return 200. 101 such characters return 400 with the length message."},
+    {"id":"TC-16","title":"Repeated or nested q rejected","what":"A request that supplies q more than once, or as an object, is refused.","criteria":["AC-04"],"type":"validation","likelihood":"rare","expected":"?q=a&q=b and ?q[x]=a each return 400 with <p class=\"error\"> containing exactly 'Search query must be a single text value'."},
+    {"id":"TC-17","title":"Quote text is plain text","what":"A reader searches for an apostrophe, and a hostile user sends SQL fragments.","criteria":["AC-05","AC-01"],"type":"security","likelihood":"occasional","expected":"q=' returns 200 with 'Ender's Game' and 'The Hitchhiker's Guide to the Galaxy' (titles HTML-escaped). q=' OR 1=1 -- returns 200 with no cards, not the full list. Neither request returns an error."},
+    {"id":"TC-18","title":"Drop-table text changes nothing","what":"A query that tries to drop a table is treated as text and the data stays intact.","criteria":["AC-05"],"type":"security","likelihood":"occasional","expected":"q=\"; DROP TABLE books; -- returns 200 with 'No books found'. A following q= returns all 50 books."}
+  ],
+  "coverage": [
+    {"criterion":"AC-01","tests":["TC-01","TC-02","TC-03","TC-04","TC-05","TC-06","TC-07","TC-08","TC-09","TC-17"]},
+    {"criterion":"AC-02","tests":["TC-09","TC-10"]},
+    {"criterion":"AC-03","tests":["TC-10","TC-11","TC-14"]},
+    {"criterion":"AC-04","tests":["TC-12","TC-13","TC-14","TC-15","TC-16"]},
+    {"criterion":"AC-05","tests":["TC-17","TC-18"]},
+    {"criterion":"AC-06","tests":[],"note":"Met by the whole set: every criterion AC-01 to AC-05 has at least one test."},
+    {"criterion":"AC-07","tests":[],"note":"Met by the whole set: the full suite, including these tests, must pass with npm run test:run."}
+  ],
+  "assumptions": [
+    {"test":"TC-04","what":"Assumes accented letters fold case and are not accent-insensitive (GAP-10). It also assumes the seed data has an author 'China Miéville'.","confidence":"medium"},
+    {"test":"TC-08","what":"Assumes '%' and '_' are literal characters (GAP-10). It also assumes no seed title or author contains '_'.","confidence":"medium"},
+    {"test":"TC-05","what":"Assumes per-field matching: the whole query must be in the title or in the author (GAP-11).","confidence":"high"},
+    {"test":"TC-06","what":"Assumes a no-match search returns 200 with the text 'No books found' (GAP-04).","confidence":"medium"},
+    {"test":"TC-07","what":"Assumes the card layout and title-ascending order (GAP-04, GAP-08).","confidence":"medium"},
+    {"test":"TC-09","what":"Assumes the seed data has 50 books and '1984' comes first (GAP-08).","confidence":"high"},
+    {"test":"TC-10","what":"Assumes whitespace-only and missing q behave like an empty q (GAP-06, GAP-03).","confidence":"high"},
+    {"test":"TC-12","what":"Assumes the limit is 100 and exactly 100 is accepted (GAP-05).","confidence":"medium"},
+    {"test":"TC-13","what":"Assumes a 400 status, the <p class=\"error\"> fragment, the exact message, and no echo of the input (GAP-07).","confidence":"medium"},
+    {"test":"TC-14","what":"Assumes length is measured after trimming (GAP-05).","confidence":"medium"},
+    {"test":"TC-15","what":"Assumes the limit counts Unicode characters, not bytes (GAP-05).","confidence":"medium"},
+    {"test":"TC-16","what":"Assumes repeated or nested q is rejected with 400 and the single-text message (GAP-03). The briefing marks this low confidence.","confidence":"low"},
+    {"test":"TC-17","what":"Assumes injection-style text is plain text and that the seed contains the two titles with an apostrophe (GAP-09).","confidence":"high"},
+    {"test":"TC-18","what":"Assumes injection-style text is plain text and never changes data (GAP-09).","confidence":"high"}
+  ],
+  "left_out": [
+    {"what":"Other query parameters being ignored (GAP-12)","why":"Rare. It is not an acceptance criterion and adds only a small check on top of TC-11."},
+    {"what":"Checking that the bound-value rule is met in the code (no string-built SQL)","why":"This is internal structure. Tests at the entry point can only show its effect, and TC-17 and TC-18 do that."},
+    {"what":"Search box in the browser: htmx:beforeSwap allowing 400, and the error replacing earlier results","why":"The briefing calls the listener a non-binding hint, and the tests are supertest only, with no browser."},
+    {"what":"HTML escaping of hostile title or author text","why":"This needs book data that the seed does not contain. Test data setup is outside the briefing, and TC-17 covers escaping with the apostrophe titles."},
+    {"what":"Separate test for a book matching in both fields appearing once","why":"It is folded into TC-05, which checks the same rule."},
+    {"what":"Very long input (10,000 characters) or timing","why":"Rare. TC-13 already shows the over-limit rule."},
+    {"what":"Regression of the existing home page list","why":"The briefing does not say to keep any behaviour unchanged, and it states no relation to this."},
+    {"what":"JSON endpoint or other HTTP methods","why":"The briefing says there is no JSON endpoint and states nothing else."}
+  ],
+  "notes": "AC-06 and AC-07 are about the test suite itself, so they have no tests of their own. AC-05 is shown only through behaviour (TC-17, TC-18, plus TC-08 for literal wildcards). No black-box test can prove the query text never appears inside the SQL text. Relations covered: AC-01 with AC-02 (TC-09), AC-03 with AC-04 (TC-14), AC-03 with AC-02 (TC-10). AC-05 constrains AC-01 and is tested under that constraint (TC-17). Rare tests: 2 of 18 (TC-15, TC-16)."
+}

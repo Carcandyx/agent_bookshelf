@@ -19,12 +19,14 @@ export function getBookById(id: number): Book | undefined {
   return get('SELECT * FROM books WHERE id = ?', [id]) as unknown as Book | undefined;
 }
 
-export function searchBooks(query: string): Book[] {
-  const pattern = `%${query}%`;
-  return all(
-    'SELECT * FROM books WHERE title LIKE ? OR author LIKE ? ORDER BY title',
-    [pattern, pattern]
-  ) as unknown as Book[];
+const SEARCH_BY_TITLE_OR_AUTHOR_SQL =
+  'SELECT * FROM books ' +
+  'WHERE instr(unicode_lower(title), unicode_lower(?)) > 0 ' +
+  'OR instr(unicode_lower(author), unicode_lower(?)) > 0 ' +
+  'ORDER BY title';
+
+export function searchBooks(text: string): Book[] {
+  return all(SEARCH_BY_TITLE_OR_AUTHOR_SQL, [text, text]) as unknown as Book[];
 }
 
 export function createBook(data: Omit<Book, 'id' | 'created_at'>): Book {

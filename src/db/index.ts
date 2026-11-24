@@ -27,6 +27,7 @@ export async function initDb(path?: string): Promise<Database> {
   }
 
   db.run('PRAGMA foreign_keys = ON');
+  registerSqlFunctions();
 
   const schema = readFileSync(join(__dirname, 'schema.sql'), 'utf-8');
   db.run(schema);
@@ -53,9 +54,17 @@ export function getDb(): Database {
 export function saveDb(): void {
   if (db) {
     const data = db.export();
+    registerSqlFunctions();
     const buffer = Buffer.from(data);
     writeFileSync(dbPath, buffer);
   }
+}
+
+// sql.js drops custom functions whenever export() reopens the connection.
+function registerSqlFunctions(): void {
+  db.create_function('unicode_lower', (value: unknown) =>
+    value === null || value === undefined ? null : String(value).toLowerCase()
+  );
 }
 
 export function closeDb(): void {

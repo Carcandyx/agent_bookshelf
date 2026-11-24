@@ -1,6 +1,8 @@
 import { Router, Request, Response } from 'express';
 import * as Book from '../models/book.js';
 import * as Review from '../models/review.js';
+import * as bookService from '../services/bookService.js';
+import { ValidationError } from '../services/errors.js';
 
 const router = Router();
 
@@ -9,17 +11,16 @@ router.get('/', (req: Request, res: Response) => {
   res.render('books/index', { books });
 });
 
-router.get('/books/search', (req: Request, res: Response) => {
-  const query = req.query.q as string;
-
-  // TODO: Implement search functionality
-  // This is a deliberate homework gap - agents should implement the search backend
-  // For now, return empty results with a message
-  res.send(`
-    <div class="search-message">
-      <p>Search functionality coming soon! This is a homework exercise for agents to implement.</p>
-    </div>
-  `);
+router.get('/books/search', function searchBooksHandler(req: Request, res: Response) {
+  try {
+    const books = bookService.searchBooks(req.query.q);
+    res.render('books/book-grid', { books });
+  } catch (err) {
+    if (err instanceof ValidationError) {
+      return res.status(400).render('books/search-error', { message: err.message });
+    }
+    throw err;
+  }
 });
 
 router.get('/books/:id', (req: Request, res: Response) => {

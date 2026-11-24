@@ -1,0 +1,16 @@
+> agent-bookshelf@1.0.0 test:run
+> vitest run
+
+ RUN  v2.1.9 C:/projects/agent_bookshelf
+
+ ✓ tests/db.test.ts (4 tests) 187ms
+ ✓ tests/models/book.test.ts (4 tests) 187ms
+ ✓ tests/routes/api.test.ts (6 tests) 319ms
+ ✓ tests/routes/book-search.test.ts (18 tests) 688ms
+
+ Test Files  4 passed (4)
+      Tests  32 passed (32)
+   Start at  00:18:07
+   Duration  2.33s (transform 408ms, setup 0ms, collect 1.99s, tests 1.38s, environment 2ms, prepare 1.41s)
+
+Result: PASS (TC-01 to TC-18 all pass; other suites 3 passed, 0 failed)
