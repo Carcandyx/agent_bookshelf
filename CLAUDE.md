@@ -57,6 +57,7 @@ Derived from the recurrent patterns in `personal_notes/prompt_categorization.md`
 - **Unbounded diffs.** Don't treat words like "improve" or "across the app" as license to touch many files without an approved plan.
 - **Weak tests.** No trivial assertions, and no passing tests that don't exercise edge cases.
 - **Weakening or mocking a test to make it pass.** If a test fails, fix the cause, or ask before changing the test. "Fix whatever fails" does not grant permission to alter tests.
+- **Hallucinated mock data.** Mock data in tests, seeds and `.md` files must be backed by implemented code. See `.claude/rules/mock-data-grounding.md`.
 - **Bypassing the DB wrapper.** Database access goes through `all/get/run` in `src/db/index.ts`, never sql.js directly.
 - **Breaking one of the two response surfaces.** HTML lives under `/`, JSON under `/api`. The global error handler in `server.ts` answers JSON for everything, and `/api` clients depend on it, so error-handling changes must preserve both.
 - **Bundling two tasks into one change.** Split them and raise it if a request mixes concerns.
