@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: criteria-tester-not-ready
+description: "Criteria-tester answers only \"NOT READY: gap <ids> still open\" when the briefing still has open gaps."
+tags: [criteria-tester, should-stop]
+context:
+  scaffold_script: fixture.sh

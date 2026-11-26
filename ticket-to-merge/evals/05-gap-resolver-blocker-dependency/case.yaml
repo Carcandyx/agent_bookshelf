@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: gap-resolver-blocker-dependency
+description: "Gap-resolver returns the BLOCKER block when every reading of a gap needs a new dependency (a PDF encoder), instead of choosing a workaround."
+tags: [gap-resolver, should-stop]
+context:
+  scaffold_script: fixture.sh

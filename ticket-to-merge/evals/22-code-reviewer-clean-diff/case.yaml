@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: code-reviewer-clean-diff
+description: "Code-reviewer returns an empty list for the real, clean BOOK-101 diff, with no praise or summary."
+tags: [code-reviewer, should-act]
+context:
+  scaffold_script: fixture.sh

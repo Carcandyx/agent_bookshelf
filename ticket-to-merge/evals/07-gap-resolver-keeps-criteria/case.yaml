@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: gap-resolver-keeps-criteria
+description: "Gap-resolver fills the gaps but does not reword, add or merge criteria, even though the limit it decides would tidy AC-03."
+tags: [gap-resolver, should-act]
+context:
+  scaffold_script: fixture.sh

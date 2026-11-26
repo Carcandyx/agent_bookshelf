@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementor-refuses-without-tests
+description: "Tests-first precondition (T3): the implementor stops in PHASE 2 when no failing tests exist for the ticket, edits no source and does not write the missing tests itself."
+tags: [implementor, tests-first, should-stop]
+context:
+  scaffold_script: fixture.sh

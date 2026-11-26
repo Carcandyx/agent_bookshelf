@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementor-plan-no-code
+description: "Implementor PLAN phase writes no code or files and plans by layer (controller, service, repository)."
+tags: [implementor, should-act]
+context:
+  scaffold_script: fixture.sh

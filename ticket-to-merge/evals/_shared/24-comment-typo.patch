@@ -1,0 +1,13 @@
+diff --git a/src/routes/api.ts b/src/routes/api.ts
+index b542c2a..fc6aae4 100644
+--- a/src/routes/api.ts
++++ b/src/routes/api.ts
+@@ -106,7 +106,7 @@ router.delete('/users/:id', (req: Request, res: Response) => {
+   res.status(204).send();
+ });
+ 
+-// Reviews API
++// Reveiws API
+ router.get('/reviews/book/:bookId', (req: Request, res: Response) => {
+   const bookId = parseInt(req.params.bookId as string, 10);
+   const reviews = Review.getReviewsByBookId(bookId);

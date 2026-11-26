@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: code-reviewer-subtle-bugs
+description: "Code-reviewer finds two subtle planted bugs the rule-based review eval does not cover: an off-by-one at the 100-character limit and a 422 where the briefing says 400."
+tags: [code-reviewer, should-act, hard]
+context:
+  scaffold_script: fixture.sh

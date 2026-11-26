@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: flow-tests-before-code
+description: "Tests-first ordering (T1): the test-writer WRITE step runs and produces red tests before the implementor edits anything under src/."
+tags: [flow, tests-first, should-act]
+context:
+  scaffold_script: fixture.sh

@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: test-writer-red-before-code
+description: "Tests-first red check (T2): the test-writer WRITE mode runs its new tests before the feature exists and reports each as red for the right reason."
+tags: [test-writer, tests-first, should-act]
+context:
+  scaffold_script: fixture.sh

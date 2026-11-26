@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: git-bot-stages-by-name
+description: "Git-bot stages only the files named in the record, leaves bookshelf.db-shm/-wal, test-run.txt and the stage marker unstaged, flags the listed plan.json that does not exist, commits with the exact message and does not push."
+tags: [git-bot, should-act]
+context:
+  scaffold_script: fixture.sh

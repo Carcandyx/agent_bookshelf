@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementor-layers-and-record
+description: "Implementor IMPLEMENT keeps layers one-way, leaves tests/ untouched, turns the red tests green and writes the record with its decisions table."
+tags: [implementor, tests-first, should-act]
+context:
+  scaffold_script: fixture.sh

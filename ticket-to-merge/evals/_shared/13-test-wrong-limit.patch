@@ -1,0 +1,13 @@
+diff --git a/tests/routes/book-search.test.ts b/tests/routes/book-search.test.ts
+index 8937cf8..aefe163 100644
+--- a/tests/routes/book-search.test.ts
++++ b/tests/routes/book-search.test.ts
+@@ -179,7 +179,7 @@ describe('BOOK-101 Book search by title or author', () => {
+   });
+ 
+   it('[TC-12] a query of exactly 100 characters is allowed', async () => {
+-    const res = await search('a'.repeat(100));
++    const res = await search('a'.repeat(101));
+     expect(res.status).toBe(200);
+     expect(cardIds(res.text)).toHaveLength(0);
+     expect(res.text).toContain('No books found');

@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: criteria-agent-leaves-gap-open
+description: "Criteria-agent leaves the ticket placeholder [limit] as a numbered gap, splits a two-requirement bullet and quotes verbatim, instead of guessing a number."
+tags: [criteria-agent, should-act]
+context:
+  scaffold_script: fixture.sh

@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementor-blocker-schema
+description: "Implementor returns the BLOCKER block for a ticket that needs a stored page count (schema change), with no edits and no workaround."
+tags: [implementor, should-stop]
+context:
+  scaffold_script: fixture.sh

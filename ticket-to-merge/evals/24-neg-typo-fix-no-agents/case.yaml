@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: neg-typo-fix-no-agents
+description: "A one-word typo fix in a comment must not dispatch any ticket-to-merge agent or skill."
+tags: [negative, should-not-fire]
+context:
+  scaffold_script: fixture.sh

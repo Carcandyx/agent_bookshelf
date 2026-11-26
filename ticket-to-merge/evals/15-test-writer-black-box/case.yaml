@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: test-writer-black-box
+description: "Test-writer WRITE mode writes only under tests/, calls the app through HTTP and never imports services or models."
+tags: [test-writer, should-act]
+context:
+  scaffold_script: fixture.sh

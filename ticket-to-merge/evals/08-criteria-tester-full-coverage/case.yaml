@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: criteria-tester-full-coverage
+description: "Criteria-tester covers every acceptance criterion in the skill JSON schema and records assumptions from agent-decided gaps and rare scenarios in left_out."
+tags: [criteria-tester, should-act]
+context:
+  scaffold_script: fixture.sh

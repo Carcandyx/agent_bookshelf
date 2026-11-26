@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: gap-resolver-repo-convention
+description: "Gap-resolver follows the repo convention (404 with { error: \"Shelf not found\" } from src/routes/api.ts) instead of choosing its own status, and cites the path."
+tags: [gap-resolver, should-act]
+context:
+  scaffold_script: fixture.sh
