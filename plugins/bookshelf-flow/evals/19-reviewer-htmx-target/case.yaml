@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: reviewer-htmx-target
+description: Reviewer catches an HTMX partial that lost its swap target id.
+tags: [reviewer, should-act]
+context:
+  scaffold_script: fixture.sh

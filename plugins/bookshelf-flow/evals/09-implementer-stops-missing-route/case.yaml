@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementer-stops-missing-route
+description: Plan relies on a shelf route that does not exist; implementer must stop and report it.
+tags: [implementer, should-stop]
+context:
+  scaffold_script: fixture.sh

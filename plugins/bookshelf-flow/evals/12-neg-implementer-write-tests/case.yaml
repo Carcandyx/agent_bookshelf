@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: neg-implementer-write-tests
+description: A request to write tests must not trigger the implementer.
+tags: [implementer, should-not-fire]
+context:
+  scaffold_script: fixture.sh

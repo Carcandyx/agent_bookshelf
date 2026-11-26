@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: neg-test-writer-implement
+description: A request to implement code must not trigger the test-writer.
+tags: [test-writer, should-not-fire]
+context:
+  scaffold_script: fixture.sh

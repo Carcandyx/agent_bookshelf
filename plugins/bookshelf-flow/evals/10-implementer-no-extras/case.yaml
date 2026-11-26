@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementer-no-extras
+description: Implementer makes only the planned change, with no extra edits.
+tags: [implementer, should-act]
+context:
+  scaffold_script: fixture.sh

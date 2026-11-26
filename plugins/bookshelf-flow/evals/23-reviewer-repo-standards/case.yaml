@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: reviewer-repo-standards
+description: Reviewer flags repo-standard violations in a model change.
+tags: [reviewer, should-act]
+context:
+  scaffold_script: fixture.sh

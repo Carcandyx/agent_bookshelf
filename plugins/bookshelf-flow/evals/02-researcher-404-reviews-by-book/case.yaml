@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: researcher-404-reviews-by-book
+description: Researcher plans a 404 for reviews-by-book using real route and model code.
+tags: [researcher, should-act]
+context:
+  scaffold_script: fixture.sh

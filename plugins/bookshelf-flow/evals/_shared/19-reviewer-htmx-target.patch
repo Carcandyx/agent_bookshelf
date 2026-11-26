@@ -1,0 +1,11 @@
+diff --git a/src/views/books/reviews-list.ejs b/src/views/books/reviews-list.ejs
+index bd4bff0..b73d8e9 100644
+--- a/src/views/books/reviews-list.ejs
++++ b/src/views/books/reviews-list.ejs
+@@ -1,5 +1,5 @@
+ <% if (reviews.length === 0) { %>
+-  <p class="no-reviews">No reviews yet. Be the first to review!</p>
++  <p class="no-reviews">No reviews yet. Be the first!</p>
+ <% } else { %>
+   <% reviews.forEach(review => { %>
+     <div class="review">

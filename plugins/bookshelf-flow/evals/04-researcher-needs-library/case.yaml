@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: researcher-needs-library
+description: Researcher recognizes the request needs a new library and flags it instead of assuming.
+tags: [researcher, should-act]
+context:
+  scaffold_script: fixture.sh

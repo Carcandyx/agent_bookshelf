@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: researcher-needs-migration
+description: Researcher recognizes a schema change needs a migration risk note for an existing bookshelf.db.
+tags: [researcher, should-act]
+context:
+  scaffold_script: fixture.sh

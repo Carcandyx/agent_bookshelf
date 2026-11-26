@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementer-follows-plan
+description: Implementer applies an approved single-file plan exactly, without extra changes.
+tags: [implementer, should-act]
+context:
+  scaffold_script: fixture.sh

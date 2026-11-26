@@ -1,0 +1,13 @@
+diff --git a/src/routes/reviews.ts b/src/routes/reviews.ts
+index 0f2da35..cbb8060 100644
+--- a/src/routes/reviews.ts
++++ b/src/routes/reviews.ts
+@@ -3,6 +3,8 @@ import * as Review from '../models/review.js';
+ 
+ const router = Router();
+ 
++// Review detail page (HTML)
++
+ router.get('/:id', (req: Request, res: Response) => {
+   const reviewId = parseInt(req.params.id as string, 10);
+   const review = Review.getReviewById(reviewId);

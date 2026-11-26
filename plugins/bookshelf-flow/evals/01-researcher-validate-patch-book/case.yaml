@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: researcher-validate-patch-book
+description: Researcher plans validation for PATCH /api/books/:id by finding the sibling POST validation pattern.
+tags: [researcher, should-act]
+context:
+  scaffold_script: fixture.sh

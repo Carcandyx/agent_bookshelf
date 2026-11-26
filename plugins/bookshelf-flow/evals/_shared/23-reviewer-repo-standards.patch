@@ -1,0 +1,25 @@
+diff --git a/src/models/review.ts b/src/models/review.ts
+index 68c97db..0f66290 100644
+--- a/src/models/review.ts
++++ b/src/models/review.ts
+@@ -1,3 +1,5 @@
++import initSqlJs from 'sql.js';
++import { get as dbGet } from '../db/index';
+ import { all, get, run } from '../db/index.js';
+ 
+ export interface Review {
+@@ -98,3 +100,14 @@ export function getAverageRating(bookId: number): number | null {
+   );
+   return result?.avg_rating as number | null;
+ }
++
++export async function exportReviewsSnapshot(): Promise<Uint8Array> {
++  const SQL = await initSqlJs();
++  const copy = new SQL.Database();
++  return copy.export();
++}
++
++export function countReviewsForBook(bookId: number): number {
++  const row = dbGet('SELECT COUNT(*) as count FROM reviews WHERE book_id = ?', [bookId]);
++  return row ? (row.count as number) : 0;
++}

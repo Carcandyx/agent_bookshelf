@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: test-writer-follows-plan-not-impl
+description: Test-writer writes tests from the plan, not from the implementation.
+tags: [test-writer, should-act]
+context:
+  scaffold_script: fixture.sh

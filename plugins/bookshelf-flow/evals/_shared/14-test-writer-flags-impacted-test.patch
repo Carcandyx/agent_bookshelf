@@ -1,0 +1,13 @@
+diff --git a/src/routes/api.ts b/src/routes/api.ts
+index b542c2a..aa04dcf 100644
+--- a/src/routes/api.ts
++++ b/src/routes/api.ts
+@@ -138,7 +138,7 @@ router.post('/reviews', (req: Request, res: Response) => {
+   }
+ 
+   if (rating < 1 || rating > 5) {
+-    return res.status(400).json({ error: 'Rating must be between 1 and 5' });
++    return res.status(422).json({ error: 'Rating must be between 1 and 5' });
+   }
+ 
+   const existing = Review.getReviewByUserAndBook(userId, bookId);

@@ -1,0 +1,16 @@
+diff --git a/src/routes/api.ts b/src/routes/api.ts
+index b542c2a..82ce794 100644
+--- a/src/routes/api.ts
++++ b/src/routes/api.ts
+@@ -152,6 +152,11 @@ router.post('/reviews', (req: Request, res: Response) => {
+ 
+ router.patch('/reviews/:id', (req: Request, res: Response) => {
+   const reviewId = parseInt(req.params.id as string, 10);
++
++  if (req.body.rating !== undefined && (req.body.rating < 1 || req.body.rating > 5)) {
++    return res.status(400).json({ error: 'Rating must be between 1 and 5' });
++  }
++
+   const review = Review.updateReview(reviewId, req.body);
+ 
+   if (!review) {

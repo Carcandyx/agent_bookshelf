@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: implementer-db-wrapper
+description: Implementer keeps database access inside the all/get/run wrapper.
+tags: [implementer, should-act]
+context:
+  scaffold_script: fixture.sh

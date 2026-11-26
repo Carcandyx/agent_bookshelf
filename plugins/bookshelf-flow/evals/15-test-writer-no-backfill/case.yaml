@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: test-writer-no-backfill
+description: Test-writer does not backfill tests for untested models.
+tags: [test-writer, should-act]
+context:
+  scaffold_script: fixture.sh

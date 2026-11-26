@@ -1,0 +1,6 @@
+schema_version: "1.1"
+name: neg-reviewer-comment-edit
+description: A comment-only edit request must not trigger the reviewer.
+tags: [reviewer, should-not-fire]
+context:
+  scaffold_script: fixture.sh

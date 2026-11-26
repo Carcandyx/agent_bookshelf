@@ -1,0 +1,8 @@
+{
+  "name": "bookshelf-flow",
+  "version": "0.1.0",
+  "description": "Four-agent flow (researcher, implementer, test-writer, reviewer) for updating an existing Agent Bookshelf endpoint, with an approval gate after the plan.",
+  "author": {
+    "name": "Agent Bookshelf"
+  }
+}
